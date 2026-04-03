@@ -9,7 +9,8 @@
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh;display:flex;align-items:center;justify-content:center}
 .card{max-width:600px;width:90%;padding:48px;border-radius:16px;background:linear-gradient(145deg,#111 0%,#1a1a2e 100%);box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .header{text-align:center;margin-bottom:32px}
-.avatar{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,#ff9900,#ff6600);display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700;color:#fff;margin:0 auto 20px}
+.avatar{width:120px;height:120px;border-radius:50%;overflow:hidden;margin:0 auto 20px;border:3px solid #ff9900}
+.avatar img{width:100%;height:100%;object-fit:cover}
 h1{font-size:28px;font-weight:700;color:#fff}
 .title{color:#ff9900;font-size:16px;margin-top:4px}
 .location{color:#888;font-size:14px;margin-top:4px}
@@ -26,27 +27,31 @@ h1{font-size:28px;font-weight:700;color:#fff}
 <body>
 <div class="card">
  <div class="header">
-   <div class="avatar">TK</div>
+   <div class="avatar">
+     <img src="photo.jpg.jpg" alt="Tomas Kmet">
+   </div>
    <h1>Tomas Kmet</h1>
    <div class="title">AWS EMEA O2C Lead</div>
    <div class="location">📍 Bratislava, Slovakia</div>
  </div>
  <div class="bio">
-   Leading Accounts Receivable operations across AWS EMEA — driving credit memo reduction, collections optimization, and cross-functional initiatives spanning Payments, FinTech, and Accounting. Passionate about using data and AI to simplify finance operations at scale.
+   Leading the Order-to-Cash function across AWS EMEA — managing a receivables portfolio up to $981MM. I drive credit memo reduction programs, collections optimization, and crisis response including the 2026 Middle East AR response. My team works at the intersection of AR operations, Payments, FinTech, and Accounting to reduce aged receivables, automate manual processes, and improve customer experience. Passionate about leveraging AI and data analytics — from Tableau/QuickSight dashboards to tools like Claire and Kiro — to simplify finance operations at scale.
  </div>
  <div class="tags">
    <span class="tag">AWS</span>
+   <span class="tag">Order-to-Cash</span>
    <span class="tag">Accounts Receivable</span>
    <span class="tag">FinOps</span>
    <span class="tag">Credit Memo Reduction</span>
    <span class="tag">Collections</span>
    <span class="tag">Data Analytics</span>
    <span class="tag">AI / Automation</span>
-   <span class="tag">EMEA</span>
+   <span class="tag">EMEA / MENAT</span>
+   <span class="tag">People Leadership</span>
  </div>
  <div class="links">
    <a class="primary" href="mailto:kmett@amazon.com">📧 kmett@amazon.com</a>
-   <a class="secondary" href="https://www.linkedin.com/in/tomaskmet/" target="_blank">💼 LinkedIn</a>
+   <a class="secondary" href="https://www.linkedin.com/in/tomas-kmet-0a53184a/" target="_blank">💼 LinkedIn</a>
  </div>
  <div class="footer">© 2026 Tomas Kmet</div>
 </div>
