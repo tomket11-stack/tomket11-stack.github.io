@@ -1,0 +1,163 @@
+1: <!DOCTYPE html>
++      2: <html lang="en">
++      3: <head>
++      4: <meta charset="UTF-8">
++      5: <meta name="viewport" content="width=device-width, initial-scale=1.0">
++      6: <title>1:1 Tracker — Tomas Kmet</title>
++      7: <style>
++      8: *{margin:0;padding:0;box-sizing:border-box}
++      9: body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
++     10: h1{text-align:center;margin:20px 0;color:#ff9900;font-size:24px}
++     11: .tabs{display:flex;gap:8px;justify-content:center;margin:20px 0;flex-wrap:wrap}
++     12: .tab{padding:10px 20px;border-radius:8px;cursor:pointer;background:#1e293b;color:#94a3b8;border:1px solid #334155;font-size:14px}
++     13: .tab.active{background:#ff9900;color:#000;border-color:#ff9900;font-weight:600}
++     14: .panel{display:none;max-width:800px;margin:0 auto}
++     15: .panel.active{display:block}
++     16: .section{background:#1e293b;border-radius:12px;padding:20px;margin:16px 0}
++     17: .section h3{color:#ff9900;margin-bottom:12px;font-size:16px}
++     18: .field{margin:10px 0}
++     19: .field label{display:block;color:#94a3b8;font-size:13px;margin-bottom:4px}
++     20: .field textarea,.field input,.field select{width:100%;padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#e2e8f0;font-size:14px;font-family:inherit}
++     21: .field textarea{height:80px;resize:vertical}
++     22: .entry{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin:8px 0}
++     23: .entry .date{color:#ff9900;font-size:12px;font-weight:600}
++     24: .entry .notes{margin-top:6px;font-size:14px;white-space:pre-wrap}
++     25: .entry .actions{margin-top:6px;color:#60a5fa;font-size:13px}
++     26: .entry .status{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin-left:8px}
++     27: .status.open{background:#7c3aed;color:#fff}
++     28: .status.done{background:#059669;color:#fff}
++     29: .status.blocked{background:#dc2626;color:#fff}
++     30: .btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600}
++     31: .btn-primary{background:#ff9900;color:#000}.btn-primary:hover{background:#ffad33}
++     32: .btn-danger{background:#dc2626;color:#fff;font-size:12px;padding:4px 10px}
++     33: .btn-done{background:#059669;color:#fff;font-size:12px;padding:4px 10px}
++     34: .row{display:flex;gap:12px;align-items:end}
++     35: .row .field{flex:1}
++     36: .history{max-height:400px;overflow-y:auto}
++     37: .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
++     38: .stat{background:#1e293b;border-radius:8px;padding:16px;text-align:center}
++     39: .stat .num{font-size:28px;font-weight:700;color:#ff9900}
++     40: .stat .label{font-size:12px;color:#94a3b8;margin-top:4px}
++     41: </style>
++     42: </head>
++     43: <body>
++     44: 
++     45: <h1>📋 1:1 Tracker</h1>
++     46: 
++     47: <div class="summary" id="summary"></div>
++     48: 
++     49: <div class="tabs" id="tabs"></div>
++     50: <div id="panels"></div>
++     51: 
++     52: <script>
++     53: const TEAM = ['Andrej Majoros','Frantisek Floch','Zuzana Cervenanska','Zdeno Tanistrak','Marianna Draganovska'];
++     54: const STORE_KEY = 'oneOnOneTracker';
++     55: 
++     56: function load(){return JSON.parse(localStorage.getItem(STORE_KEY)||'{}');}
++     57: function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d));}
++     58: 
++     59: function init(){
++     60:   const data=load();
++     61:   TEAM.forEach(name=>{if(!data[name])data[name]={entries:[]};});
++     62:   save(data);
++     63:   renderTabs();
++     64:   renderSummary();
++     65:   showTab(TEAM[0]);
++     66: }
++     67: 
++     68: function renderTabs(){
++     69:   const tabs=document.getElementById('tabs');
++     70:   tabs.innerHTML=TEAM.map(n=>`<div class="tab" onclick="showTab('${n}')" id="tab-${n.replace(/ /g,'_')}">${n.split(' ')[0]}</div>`).join('');
++     71: }
++     72: 
++     73: function showTab(name){
++     74:   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
++     75:   document.getElementById('tab-'+name.replace(/ /g,'_')).classList.add('active');
++     76:   renderPanel(name);
++     77: }
++     78: 
++     79: function renderPanel(name){
++     80:   const data=load();
++     81:   const entries=data[name].entries||[];
++     82:   const p=document.getElementById('panels');
++     83:   p.innerHTML=`
++     84:     <div class="panel active">
++     85:       <div class="section">
++     86:         <h3>➕ New 1:1 Entry — ${name}</h3>
++     87:         <div class="field"><label>Date</label><input type="date" id="newDate" value="${new Date().toISOString().split('T')[0]}"></div>
++     88:         <div class="field"><label>Discussion Notes</label><textarea id="newNotes" placeholder="What did you discuss?"></textarea></div>
++     89:         <div class="field"><label>Action Items</label><textarea id="newActions" placeholder="What needs to happen next?"></textarea></div>
++     90:         <div class="row">
++     91:           <div class="field"><label>Action Owner</label>
++     92:             <select id="newOwner"><option>Me</option><option>${name.split(' ')[0]}</option><option>Both</option></select>
++     93:           </div>
++     94:           <div class="field"><label>Due Date</label><input type="date" id="newDue"></div>
++     95:           <div class="field"><label>Status</label>
++     96:             <select id="newStatus"><option value="open">Open</option><option value="done">Done</option><option value="blocked">Blocked</option></select>
++     97:           </div>
++     98:         </div>
++     99:         <div class="field"><label>Mood / Energy</label>
++    100:           <select id="newMood"><option>😊 Positive</option><option>😐 Neutral</option><option>😟 Concerned</option><option>🔥 Motivated</option><option>😩 Stressed</option></select>
++    101:         </div>
++    102:         <div class="field"><label>Topics for Next Time</label><textarea id="newNext" placeholder="What to follow up on next 1:1"></textarea></div>
++    103:         <br><button class="btn btn-primary" onclick="addEntry('${name}')">Save Entry</button>
++    104:       </div>
++    105: 
++    106:       <div class="section">
++    107:         <h3>📜 History</h3>
++    108:         <div class="history">${entries.slice().reverse().map((e,i)=>`
++    109:           <div class="entry">
++    110:             <div class="date">${e.date} ${e.mood||''} <span class="status ${e.status}">${e.status}</span>
++    111:               <button class="btn-done" onclick="toggleStatus('${name}',${entries.length-1-i})" style="float:right">Toggle Status</button>
++    112:               <button class="btn-danger" onclick="deleteEntry('${name}',${entries.length-1-i})" style="float:right;margin-right:4px">Delete</button>
++    113:             </div>
++    114:             <div class="notes">${e.notes}</div>
++    115:             <div class="actions">⚡ ${e.actions||'No actions'} — Owner: ${e.owner||'N/A'} ${e.due?' — Due: '+e.due:''}</div>
++    116:             ${e.next?'<div class="actions" style="color:#a78bfa">📌 Next time: '+e.next+'</div>':''}
++    117:           </div>`).join('')||'<p style="color:#64748b">No entries yet. Add your first 1:1 note above.</p>'}
++    118:         </div>
++    119:       </div>
++    120:     </div>`;
++    121: }
++    122: 
++    123: function addEntry(name){
++    124:   const data=load();
++    125:   data[name].entries.push({
++    126:     date:document.getElementById('newDate').value,
++    127:     notes:document.getElementById('newNotes').value,
++    128:     actions:document.getElementById('newActions').value,
++    129:     owner:document.getElementById('newOwner').value,
++    130:     due:document.getElementById('newDue').value,
++    131:     status:document.getElementById('newStatus').value,
++    132:     mood:document.getElementById('newMood').value,
++    133:     next:document.getElementById('newNext').value
++    134:   });
++    135:   save(data);renderPanel(name);renderSummary();
++    136: }
++    137: 
++    138: function deleteEntry(name,i){
++    139:   const data=load();data[name].entries.splice(i,1);save(data);renderPanel(name);renderSummary();
++    140: }
++    141: 
++    142: function toggleStatus(name,i){
++    143:   const data=load();
++    144:   const s=data[name].entries[i].status;
++    145:   data[name].entries[i].status=s==='open'?'done':s==='done'?'blocked':'open';
++    146:   save(data);renderPanel(name);renderSummary();
++    147: }
++    148: 
++    149: function renderSummary(){
++    150:   const data=load();
++    151:   let total=0,open=0,done=0;
++    152:   TEAM.forEach(n=>{(data[n]?.entries||[]).forEach(e=>{total++;if(e.status==='open')open++;if(e.status==='done')done++;});});
++    153:   document.getElementById('summary').innerHTML=`
++    154:     <div class="stat"><div class="num">${TEAM.length}</div><div class="label">Direct Reports</div></div>
++    155:     <div class="stat"><div class="num">${total}</div><div class="label">Total Entries</div></div>
++    156:     <div class="stat"><div class="num">${open}</div><div class="label">Open Actions</div></div>
++    157:     <div class="stat"><div class="num">${done}</div><div class="label">Completed</div></div>`;
++    158: }
++    159: 
++    160: init();
++    161: </script>
++    162: </body>
++    163: </html>
